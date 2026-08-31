@@ -1,0 +1,2126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мудрость перемен — игра по психологии</title>
+    <style>
+        /* ============================================================
+           СТИЛЬ "ТЁПЛАЯ ЗРЕЛОСТЬ" — уют, спокойствие, поддержка
+           ============================================================ */
+        :root {
+            --game-bg: #EEE7DD;
+            --game-card: #FDF8F2;
+            --game-primary: #7A5A4B;
+            --game-accent: #C49A6C;
+            --game-text: #3D2C24;
+            --game-success: #7A9B7A;
+            --game-error: #B57A7A;
+            --game-muted: #A89888;
+            --game-shadow: rgba(122, 90, 75, 0.15);
+            --game-radius: 24px;
+            --game-font: 'Segoe UI', 'Georgia', serif;
+            --warm-pattern: repeating-linear-gradient(45deg, rgba(122, 90, 75, 0.03) 0px, rgba(122, 90, 75, 0.03) 2px, transparent 2px, transparent 10px);
+        }
+
+        /* ============================================================
+           ГЛОБАЛЬНЫЙ СБРОС И БАЗА
+           ============================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--game-font);
+            background: var(--game-bg);
+            color: var(--game-text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+            background-image:
+                var(--warm-pattern),
+                radial-gradient(ellipse at 20% 30%, rgba(196, 154, 108, 0.10) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 70%, rgba(122, 154, 122, 0.06) 0%, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        /* ============================================================
+           КОНТЕЙНЕР ИГРЫ
+           ============================================================ */
+        #game-container {
+            max-width: 840px;
+            width: 100%;
+            background: var(--game-card);
+            border-radius: var(--game-radius);
+            box-shadow: 0 20px 60px var(--game-shadow);
+            padding: 32px 30px 28px;
+            position: relative;
+            overflow: hidden;
+            min-height: 620px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(122, 90, 75, 0.06);
+        }
+
+        /* декоративная рамка */
+        #game-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 5% 10%, rgba(196, 154, 108, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 95% 90%, rgba(122, 154, 122, 0.05) 0%, transparent 40%);
+            border-radius: var(--game-radius);
+        }
+
+        #game-container::after {
+            content: '';
+            position: absolute;
+            top: 14px;
+            left: 30px;
+            right: 30px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--game-accent), var(--game-primary), var(--game-accent), transparent);
+            opacity: 0.2;
+            border-radius: 4px;
+        }
+
+        /* ============================================================
+           ОБЩИЕ КОМПОНЕНТЫ
+           ============================================================ */
+        .screen {
+            display: none;
+            animation: fadeIn 0.5s ease;
+            position: relative;
+            z-index: 2;
+        }
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .game-title {
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: var(--game-primary);
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+            font-family: 'Georgia', serif;
+        }
+        .game-subtitle {
+            font-size: 1.1rem;
+            color: var(--game-muted);
+            font-weight: 400;
+            margin-bottom: 16px;
+        }
+
+        /* кнопки */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 36px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-family: var(--game-font);
+            background: var(--game-primary);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(122, 90, 75, 0.30);
+            min-height: 56px;
+            gap: 10px;
+            letter-spacing: 0.3px;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(122, 90, 75, 0.35);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        .btn-accent {
+            background: var(--game-accent);
+            box-shadow: 0 4px 14px rgba(196, 154, 108, 0.35);
+        }
+        .btn-accent:hover {
+            box-shadow: 0 8px 24px rgba(196, 154, 108, 0.45);
+        }
+        .btn-success {
+            background: var(--game-success);
+            box-shadow: 0 4px 14px rgba(122, 155, 122, 0.35);
+        }
+        .btn-outline {
+            background: transparent;
+            color: var(--game-primary);
+            box-shadow: none;
+            border: 2px solid var(--game-primary);
+        }
+        .btn-outline:hover {
+            background: var(--game-primary);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(122, 90, 75, 0.30);
+        }
+        .btn-sm {
+            padding: 10px 24px;
+            font-size: 0.95rem;
+            min-height: 44px;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        /* карточки */
+        .card {
+            background: var(--game-card);
+            border-radius: var(--game-radius);
+            padding: 24px 28px;
+            box-shadow: 0 6px 24px var(--game-shadow);
+            border: 1px solid rgba(122, 90, 75, 0.06);
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        /* прогресс-бар */
+        .progress-wrap {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 18px;
+            padding: 0 4px;
+        }
+        .progress-track {
+            flex: 1;
+            height: 10px;
+            background: rgba(168, 152, 136, 0.20);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--game-success), var(--game-accent));
+            border-radius: 20px;
+            transition: width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .progress-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--game-muted);
+            min-width: 70px;
+            text-align: right;
+        }
+
+        /* звёзды */
+        .stars {
+            display: flex;
+            gap: 6px;
+            font-size: 2.2rem;
+            line-height: 1;
+            margin: 8px 0;
+            justify-content: center;
+        }
+        .stars .star {
+            color: #ddd;
+            transition: color 0.3s ease;
+        }
+        .stars .star.active {
+            color: #F5C542;
+            text-shadow: 0 2px 8px rgba(245, 197, 66, 0.3);
+        }
+
+        /* счётчик баллов (глобальный) */
+        #global-score {
+            position: absolute;
+            top: 16px;
+            right: 28px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--game-primary);
+            background: rgba(122, 90, 75, 0.06);
+            padding: 6px 18px;
+            border-radius: 40px;
+            border: 1px solid rgba(122, 90, 75, 0.08);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(4px);
+        }
+        #global-score span {
+            color: var(--game-accent);
+            font-size: 1.2rem;
+        }
+
+        /* таймер */
+        .timer-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        .timer-ring {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--game-text);
+            background: rgba(122, 90, 75, 0.06);
+            border: 3px solid var(--game-primary);
+            transition: border-color 0.3s ease, color 0.3s ease;
+        }
+        .timer-ring.warning {
+            border-color: var(--game-error);
+            color: var(--game-error);
+            animation: pulse 0.8s infinite alternate;
+        }
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.08);
+            }
+        }
+
+        /* ============================================================
+           СТАРТОВЫЙ ЭКРАН
+           ============================================================ */
+        #start-screen {
+            text-align: center;
+            padding: 30px 10px 20px;
+        }
+        #start-screen .game-icon {
+            font-size: 4.6rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+        #start-screen .legend {
+            font-size: 1.08rem;
+            color: var(--game-muted);
+            max-width: 500px;
+            margin: 12px auto 28px;
+            line-height: 1.7;
+            background: rgba(196, 154, 108, 0.06);
+            padding: 18px 24px;
+            border-radius: 16px;
+            border-left: 5px solid var(--game-accent);
+        }
+
+        /* ============================================================
+           ЭТАП 1 — ВИКТОРИНА
+           ============================================================ */
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 18px;
+            line-height: 1.5;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        @media (max-width: 560px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .option-btn {
+            padding: 16px 20px;
+            border: 2px solid rgba(168, 152, 136, 0.2);
+            border-radius: 14px;
+            background: var(--game-card);
+            cursor: pointer;
+            font-size: 1rem;
+            font-family: var(--game-font);
+            text-align: left;
+            transition: all 0.2s ease;
+            color: var(--game-text);
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            min-height: 56px;
+        }
+        .option-btn:hover:not(.disabled) {
+            border-color: var(--game-primary);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px var(--game-shadow);
+        }
+        .option-btn .marker {
+            font-weight: 700;
+            color: var(--game-muted);
+            min-width: 24px;
+        }
+        .option-btn.correct {
+            border-color: var(--game-success);
+            background: rgba(122, 155, 122, 0.07);
+        }
+        .option-btn.correct .marker::after {
+            content: ' ✓';
+            color: var(--game-success);
+        }
+        .option-btn.wrong {
+            border-color: var(--game-error);
+            background: rgba(181, 122, 122, 0.07);
+        }
+        .option-btn.wrong .marker::after {
+            content: ' ✗';
+            color: var(--game-error);
+        }
+        .option-btn.show-correct {
+            border-color: var(--game-success);
+            background: rgba(122, 155, 122, 0.07);
+        }
+        .option-btn.show-correct .marker::after {
+            content: ' ✓';
+            color: var(--game-success);
+        }
+        .option-btn.disabled {
+            cursor: default;
+            opacity: 0.7;
+        }
+        .option-btn .opt-label {
+            font-weight: 500;
+        }
+
+        .feedback-box {
+            margin-top: 18px;
+            padding: 16px 20px;
+            border-radius: 14px;
+            font-size: 0.98rem;
+            line-height: 1.5;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .feedback-box.show {
+            display: block;
+        }
+        .feedback-box.success {
+            background: rgba(122, 155, 122, 0.08);
+            border-left: 4px solid var(--game-success);
+        }
+        .feedback-box.error {
+            background: rgba(181, 122, 122, 0.08);
+            border-left: 4px solid var(--game-error);
+        }
+        .feedback-box .fb-title {
+            font-weight: 700;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .feedback-box .fb-title .icon {
+            font-size: 1.3rem;
+        }
+
+        /* карта уровней */
+        .level-map {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin: 12px 0 20px;
+            flex-wrap: wrap;
+        }
+        .level-map .lv {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 14px;
+            background: rgba(168, 152, 136, 0.06);
+            border: 2px solid rgba(168, 152, 136, 0.15);
+            min-width: 80px;
+            transition: all 0.3s ease;
+        }
+        .level-map .lv .lv-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .level-map .lv .lv-stars {
+            font-size: 1.3rem;
+            letter-spacing: 2px;
+        }
+        .level-map .lv.unlocked {
+            border-color: var(--game-primary);
+            background: rgba(122, 90, 75, 0.04);
+        }
+        .level-map .lv.locked {
+            opacity: 0.5;
+            filter: grayscale(0.4);
+        }
+        .level-map .lv.completed {
+            border-color: var(--game-success);
+            background: rgba(122, 155, 122, 0.06);
+        }
+
+        /* ============================================================
+           ЭТАП 2 — НЕСКОЛЬКО ПРАВИЛЬНЫХ
+           ============================================================ */
+        .multi-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        @media (max-width: 560px) {
+            .multi-options {
+                grid-template-columns: 1fr;
+            }
+        }
+        .multi-opt {
+            padding: 14px 18px;
+            border: 2px solid rgba(168, 152, 136, 0.2);
+            border-radius: 14px;
+            background: var(--game-card);
+            cursor: pointer;
+            font-size: 1rem;
+            font-family: var(--game-font);
+            text-align: left;
+            transition: all 0.2s ease;
+            color: var(--game-text);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 50px;
+            user-select: none;
+        }
+        .multi-opt:hover:not(.disabled) {
+            border-color: var(--game-primary);
+        }
+        .multi-opt .check {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            border: 2px solid var(--game-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: transparent;
+        }
+        .multi-opt.selected .check {
+            border-color: var(--game-primary);
+            background: var(--game-primary);
+            color: #fff;
+        }
+        .multi-opt.selected .check::after {
+            content: '✓';
+        }
+        .multi-opt.correct {
+            border-color: var(--game-success);
+            background: rgba(122, 155, 122, 0.07);
+        }
+        .multi-opt.correct .check {
+            border-color: var(--game-success);
+            background: var(--game-success);
+            color: #fff;
+        }
+        .multi-opt.correct .check::after {
+            content: '✓';
+        }
+        .multi-opt.wrong {
+            border-color: var(--game-error);
+            background: rgba(181, 122, 122, 0.07);
+        }
+        .multi-opt.wrong .check {
+            border-color: var(--game-error);
+            background: var(--game-error);
+            color: #fff;
+        }
+        .multi-opt.wrong .check::after {
+            content: '✗';
+        }
+        .multi-opt.missed {
+            border-color: var(--game-muted);
+            background: rgba(168, 152, 136, 0.06);
+            opacity: 0.8;
+        }
+        .multi-opt.missed .check {
+            border-color: var(--game-muted);
+            background: var(--game-muted);
+            color: #fff;
+        }
+        .multi-opt.missed .check::after {
+            content: '?';
+        }
+        .multi-opt.disabled {
+            cursor: default;
+        }
+
+        .check-btn-wrap {
+            margin-top: 18px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* ============================================================
+           ЭТАП 3 — ВСТАВЬ СЛОВО
+           ============================================================ */
+        .fill-task {
+            margin-bottom: 20px;
+        }
+        .fill-sentence {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            padding: 16px 20px;
+            background: rgba(122, 90, 75, 0.03);
+            border-radius: 14px;
+            border: 1px solid rgba(122, 90, 75, 0.06);
+            margin-bottom: 16px;
+        }
+        .fill-sentence .blank-place {
+            display: inline-block;
+            min-width: 120px;
+            padding: 4px 12px;
+            border-bottom: 3px dashed var(--game-primary);
+            margin: 0 4px;
+            font-weight: 700;
+            color: var(--game-primary);
+            text-align: center;
+            background: rgba(122, 90, 75, 0.04);
+            border-radius: 4px 4px 0 0;
+            transition: all 0.3s ease;
+        }
+        .fill-sentence .blank-place.filled {
+            border-bottom-color: var(--game-success);
+            color: var(--game-success);
+        }
+        .fill-sentence .blank-place.wrong-filled {
+            border-bottom-color: var(--game-error);
+            color: var(--game-error);
+        }
+
+        .fill-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 8px;
+        }
+        .fill-opt {
+            padding: 10px 22px;
+            border: 2px solid rgba(168, 152, 136, 0.2);
+            border-radius: 40px;
+            background: var(--game-card);
+            cursor: pointer;
+            font-size: 0.98rem;
+            font-family: var(--game-font);
+            transition: all 0.2s ease;
+            color: var(--game-text);
+            font-weight: 500;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        }
+        .fill-opt:hover:not(.disabled) {
+            border-color: var(--game-primary);
+            transform: translateY(-1px);
+        }
+        .fill-opt.selected {
+            border-color: var(--game-primary);
+            background: rgba(122, 90, 75, 0.06);
+        }
+        .fill-opt.correct {
+            border-color: var(--game-success);
+            background: rgba(122, 155, 122, 0.08);
+            color: var(--game-success);
+        }
+        .fill-opt.wrong {
+            border-color: var(--game-error);
+            background: rgba(181, 122, 122, 0.08);
+            color: var(--game-error);
+        }
+        .fill-opt.show-correct {
+            border-color: var(--game-success);
+            background: rgba(122, 155, 122, 0.08);
+        }
+        .fill-opt.disabled {
+            cursor: default;
+            opacity: 0.6;
+        }
+
+        /* ============================================================
+           ЭКРАНЫ ЗАВЕРШЕНИЯ ЭТАПОВ / ФИНАЛ
+           ============================================================ */
+        .stage-complete {
+            text-align: center;
+            padding: 20px 10px;
+        }
+        .stage-complete .big-icon {
+            font-size: 4.2rem;
+            margin-bottom: 8px;
+        }
+        .stage-complete h2 {
+            font-size: 1.8rem;
+            color: var(--game-primary);
+            margin-bottom: 4px;
+        }
+        .stage-complete .result-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 16px 0;
+            flex-wrap: wrap;
+        }
+        .stage-complete .stat-item {
+            text-align: center;
+        }
+        .stage-complete .stat-item .num {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--game-primary);
+        }
+        .stage-complete .stat-item .label {
+            font-size: 0.85rem;
+            color: var(--game-muted);
+        }
+
+        .final-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .final-stats .fs-item {
+            background: rgba(122, 90, 75, 0.04);
+            border-radius: 16px;
+            padding: 16px 10px;
+            text-align: center;
+            border: 1px solid rgba(122, 90, 75, 0.06);
+        }
+        .final-stats .fs-item .num {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--game-primary);
+        }
+        .final-stats .fs-item .label {
+            font-size: 0.8rem;
+            color: var(--game-muted);
+        }
+
+        /* ============================================================
+           КОНФЕТТИ (CANVAS)
+           ============================================================ */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* ============================================================
+           АНИМАЦИЯ ПОКАЧИВАНИЯ
+           ============================================================ */
+        @keyframes shake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            20% {
+                transform: translateX(-12px);
+            }
+            40% {
+                transform: translateX(12px);
+            }
+            60% {
+                transform: translateX(-8px);
+            }
+            80% {
+                transform: translateX(8px);
+            }
+        }
+        .shake {
+            animation: shake 0.5s ease;
+        }
+
+        /* ============================================================
+           АДАПТИВНОСТЬ
+           ============================================================ */
+        @media (max-width: 640px) {
+            #game-container {
+                padding: 20px 16px 20px;
+                border-radius: 18px;
+                min-height: 480px;
+            }
+            .game-title {
+                font-size: 1.8rem;
+            }
+            .question-text {
+                font-size: 1.05rem;
+            }
+            #global-score {
+                font-size: 0.85rem;
+                padding: 4px 14px;
+                top: 10px;
+                right: 14px;
+            }
+            .btn {
+                padding: 12px 24px;
+                font-size: 0.95rem;
+                min-height: 48px;
+            }
+            .card {
+                padding: 16px 18px;
+            }
+            .fill-sentence {
+                font-size: 1.05rem;
+                padding: 12px 16px;
+            }
+            .fill-opt {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+            .stars {
+                font-size: 1.8rem;
+            }
+            .stage-complete .result-stats {
+                gap: 20px;
+            }
+            .stage-complete .stat-item .num {
+                font-size: 1.6rem;
+            }
+            .level-map .lv {
+                padding: 6px 12px;
+                min-width: 60px;
+            }
+            .level-map .lv .lv-stars {
+                font-size: 1rem;
+            }
+            .timer-ring {
+                width: 36px;
+                height: 36px;
+                font-size: 0.9rem;
+            }
+        }
+        @media (max-width: 400px) {
+            #game-container {
+                padding: 12px 8px 16px;
+            }
+            .game-title {
+                font-size: 1.4rem;
+            }
+            .option-btn {
+                padding: 12px 14px;
+                font-size: 0.9rem;
+                min-height: 48px;
+            }
+            .multi-opt {
+                padding: 10px 14px;
+                font-size: 0.9rem;
+                min-height: 44px;
+            }
+            .btn {
+                padding: 10px 18px;
+                font-size: 0.85rem;
+                min-height: 42px;
+            }
+            .fill-sentence {
+                font-size: 0.95rem;
+                padding: 10px 12px;
+            }
+        }
+
+        /* ============================================================
+           ДЕКОРАТИВНЫЕ ШТРИХИ
+           ============================================================ */
+        .deco-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--game-accent);
+            margin: 0 4px;
+            opacity: 0.3;
+        }
+        .deco-line {
+            height: 3px;
+            width: 60px;
+            background: linear-gradient(90deg, var(--game-primary), var(--game-accent));
+            border-radius: 4px;
+            margin: 8px auto 14px;
+            opacity: 0.3;
+        }
+        .deco-flower {
+            display: inline-block;
+            font-size: 1.4rem;
+            opacity: 0.2;
+            margin: 0 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================
+    КОНФЕТТИ CANVAS
+    ============================================================ -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- ============================================================
+    ОСНОВНОЙ КОНТЕЙНЕР
+    ============================================================ -->
+    <div id="game-container">
+
+        <!-- Глобальный счёт -->
+        <div id="global-score">
+            ⭐ <span id="total-score-display">0</span>
+        </div>
+
+        <!-- ============================================================
+        СТАРТОВЫЙ ЭКРАН
+        ============================================================ -->
+        <div id="start-screen" class="screen active">
+            <span class="game-icon">🕊️</span>
+            <h1 class="game-title">Мудрость перемен</h1>
+            <p class="game-subtitle">Игра по возрастной психологии · 65+</p>
+            <div class="legend">
+                <strong>Потеря работы</strong> – это не конец, а начало нового этапа.
+                <br>Давай вместе узнаем, как сохранить душевное равновесие и найти новые смыслы.
+                <br><br>
+                <span style="color:var(--game-primary);font-weight:600;">3 этапа</span>
+                <span class="deco-dot"></span>
+                <span style="color:var(--game-accent);font-weight:600;">викторина, выбор, вставка</span>
+                <span class="deco-dot"></span>
+                <span style="color:var(--game-success);font-weight:600;">звёзды и мудрые советы</span>
+            </div>
+            <button class="btn" id="start-game-btn">Начать игру →</button>
+            <div class="deco-line" style="margin-top:24px;"></div>
+            <p style="font-size:0.85rem;color:var(--game-muted);margin-top:8px;">
+                <span class="deco-flower">🌿</span> Ваш опыт — ваша сила <span class="deco-flower">🌿</span>
+            </p>
+        </div>
+
+        <!-- ============================================================
+        ЭТАП 1 — ВИКТОРИНА
+        ============================================================ -->
+        <div id="stage1-screen" class="screen">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:4px;">
+                <div style="font-weight:600;color:var(--game-primary);font-size:0.95rem;">
+                    Этап 1 · Викторина
+                    <span style="color:var(--game-muted);font-weight:400;margin-left:8px;" id="s1-level-label">Лёгкий</span>
+                </div>
+                <div class="timer-wrap">
+                    <span style="font-size:0.85rem;color:var(--game-muted);">⏱</span>
+                    <div class="timer-ring" id="s1-timer">30</div>
+                </div>
+            </div>
+
+            <div class="progress-wrap">
+                <div class="progress-track">
+                    <div class="progress-fill" id="s1-progress" style="width:0%;"></div>
+                </div>
+                <div class="progress-label" id="s1-progress-label">0 / 5</div>
+            </div>
+
+            <!-- карта уровней -->
+            <div class="level-map" id="s1-level-map">
+                <div class="lv unlocked" data-level="0">
+                    <span class="lv-name">🌱 Лёгкий</span>
+                    <span class="lv-stars" id="lv-stars-0">☆☆</span>
+                </div>
+                <div class="lv locked" data-level="1">
+                    <span class="lv-name">🌟 Средний</span>
+                    <span class="lv-stars" id="lv-stars-1">☆☆</span>
+                </div>
+                <div class="lv locked" data-level="2">
+                    <span class="lv-name">🏆 Сложный</span>
+                    <span class="lv-stars" id="lv-stars-2">☆</span>
+                </div>
+            </div>
+
+            <div class="card" id="s1-question-card">
+                <div class="question-text" id="s1-question-text">Загрузка вопроса...</div>
+                <div class="options-grid" id="s1-options-grid"></div>
+                <div class="feedback-box" id="s1-feedback">
+                    <div class="fb-title"><span class="icon"></span> <span class="fb-title-text"></span></div>
+                    <div class="fb-body" style="margin-top:6px;"></div>
+                </div>
+                <div class="btn-group" id="s1-next-wrap" style="display:none;">
+                    <button class="btn btn-accent btn-sm" id="s1-next-btn">Дальше →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        ЭТАП 1 — ЗАВЕРШЕНИЕ
+        ============================================================ -->
+        <div id="stage1-complete-screen" class="screen stage-complete">
+            <div class="big-icon" id="s1-complete-icon">🎉</div>
+            <h2 id="s1-complete-title">Этап 1 пройден!</h2>
+            <div class="result-stats">
+                <div class="stat-item"><div class="num" id="s1-complete-correct">0</div><div class="label">верных</div></div>
+                <div class="stat-item"><div class="num" id="s1-complete-total">0</div><div class="label">всего</div></div>
+                <div class="stat-item"><div class="num" id="s1-complete-pct">0%</div><div class="label">результат</div></div>
+            </div>
+            <div class="stars" id="s1-complete-stars"><span class="star">⭐</span><span class="star">⭐</span><span class="star">⭐</span></div>
+            <div style="font-size:0.95rem;color:var(--game-muted);margin:4px 0 16px;" id="s1-complete-msg"></div>
+            <button class="btn" id="s1-to-stage2">Перейти к этапу 2 →</button>
+        </div>
+
+        <!-- ============================================================
+        ЭТАП 2 — НЕСКОЛЬКО ПРАВИЛЬНЫХ
+        ============================================================ -->
+        <div id="stage2-screen" class="screen">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:4px;">
+                <div style="font-weight:600;color:var(--game-primary);font-size:0.95rem;">
+                    Этап 2 · Выбери все верные
+                    <span style="color:var(--game-muted);font-weight:400;margin-left:8px;" id="s2-task-label">Задание 1 из 4</span>
+                </div>
+            </div>
+
+            <div class="progress-wrap">
+                <div class="progress-track">
+                    <div class="progress-fill" id="s2-progress" style="width:0%;"></div>
+                </div>
+                <div class="progress-label" id="s2-progress-label">0 / 4</div>
+            </div>
+
+            <div class="card">
+                <div class="question-text" id="s2-question-text">Загрузка задания...</div>
+                <div class="multi-options" id="s2-options-grid"></div>
+                <div class="feedback-box" id="s2-feedback">
+                    <div class="fb-title"><span class="icon"></span> <span class="fb-title-text"></span></div>
+                    <div class="fb-body" style="margin-top:6px;"></div>
+                </div>
+                <div class="check-btn-wrap">
+                    <button class="btn btn-accent btn-sm" id="s2-check-btn">Проверить</button>
+                    <button class="btn btn-outline btn-sm" id="s2-next-btn" style="display:none;">Дальше →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        ЭТАП 2 — ЗАВЕРШЕНИЕ
+        ============================================================ -->
+        <div id="stage2-complete-screen" class="screen stage-complete">
+            <div class="big-icon">🌟</div>
+            <h2>Этап 2 пройден!</h2>
+            <div class="result-stats">
+                <div class="stat-item"><div class="num" id="s2-complete-correct">0</div><div class="label">верных</div></div>
+                <div class="stat-item"><div class="num" id="s2-complete-total">0</div><div class="label">всего</div></div>
+                <div class="stat-item"><div class="num" id="s2-complete-pct">0%</div><div class="label">результат</div></div>
+            </div>
+            <div class="stars" id="s2-complete-stars"><span class="star">⭐</span><span class="star">⭐</span><span class="star">⭐</span></div>
+            <button class="btn" id="s2-to-stage3">Перейти к этапу 3 →</button>
+        </div>
+
+        <!-- ============================================================
+        ЭТАП 3 — ВСТАВЬ СЛОВО
+        ============================================================ -->
+        <div id="stage3-screen" class="screen">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:4px;">
+                <div style="font-weight:600;color:var(--game-primary);font-size:0.95rem;">
+                    Этап 3 · Вставь слово
+                    <span style="color:var(--game-muted);font-weight:400;margin-left:8px;" id="s3-task-label">Задание 1 из 6</span>
+                </div>
+            </div>
+
+            <div class="progress-wrap">
+                <div class="progress-track">
+                    <div class="progress-fill" id="s3-progress" style="width:0%;"></div>
+                </div>
+                <div class="progress-label" id="s3-progress-label">0 / 6</div>
+            </div>
+
+            <div class="card">
+                <div class="fill-task" id="s3-task-container">
+                    <div class="fill-sentence" id="s3-sentence"></div>
+                    <div class="fill-options" id="s3-options-wrap"></div>
+                </div>
+                <div class="feedback-box" id="s3-feedback">
+                    <div class="fb-title"><span class="icon"></span> <span class="fb-title-text"></span></div>
+                    <div class="fb-body" style="margin-top:6px;"></div>
+                </div>
+                <div class="check-btn-wrap" style="margin-top:14px;">
+                    <button class="btn btn-outline btn-sm" id="s3-clear-btn">Очистить</button>
+                    <button class="btn btn-accent btn-sm" id="s3-check-btn">Проверить</button>
+                    <button class="btn btn-sm" id="s3-next-btn" style="display:none;">Дальше →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        ЭТАП 3 — ЗАВЕРШЕНИЕ
+        ============================================================ -->
+        <div id="stage3-complete-screen" class="screen stage-complete">
+            <div class="big-icon">📚</div>
+            <h2>Этап 3 пройден!</h2>
+            <div class="result-stats">
+                <div class="stat-item"><div class="num" id="s3-complete-correct">0</div><div class="label">верных</div></div>
+                <div class="stat-item"><div class="num" id="s3-complete-total">0</div><div class="label">всего</div></div>
+                <div class="stat-item"><div class="num" id="s3-complete-pct">0%</div><div class="label">результат</div></div>
+            </div>
+            <div class="stars" id="s3-complete-stars"><span class="star">⭐</span><span class="star">⭐</span><span class="star">⭐</span></div>
+            <button class="btn" id="s3-to-final">Посмотреть финальный результат 🏁</button>
+        </div>
+
+        <!-- ============================================================
+        ФИНАЛЬНЫЙ ЭКРАН
+        ============================================================ -->
+        <div id="final-screen" class="screen stage-complete">
+            <div class="big-icon" id="final-icon">🏆</div>
+            <h2 id="final-title">Игра завершена!</h2>
+            <p style="color:var(--game-muted);font-size:1.05rem;" id="final-sub">Вы проявили мудрость и стойкость</p>
+
+            <div class="final-stats">
+                <div class="fs-item"><div class="num" id="final-total-correct">0</div><div class="label">всего верных</div></div>
+                <div class="fs-item"><div class="num" id="final-total-questions">0</div><div class="label">всего заданий</div></div>
+                <div class="fs-item"><div class="num" id="final-total-pct">0%</div><div class="label">общий результат</div></div>
+                <div class="fs-item"><div class="num" id="final-total-score">0</div><div class="label">баллов</div></div>
+            </div>
+
+            <div class="stars" id="final-stars"><span class="star">⭐</span><span class="star">⭐</span><span class="star">⭐</span></div>
+            <div style="font-size:0.95rem;color:var(--game-muted);margin:4px 0 20px;" id="final-message"></div>
+
+            <div class="btn-group">
+                <button class="btn" id="final-restart-btn">Играть снова 🔄</button>
+            </div>
+            <div style="margin-top:12px;font-size:0.85rem;color:var(--game-muted);">
+                <span>🌿</span> Жизнь не заканчивается с одной главой — новые возможности ждут <span>🌿</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ============================================================
+    ЗВУКОВОЙ КОНТЕКСТ (Web Audio)
+    ============================================================ -->
+    <div id="audio-context"></div>
+
+    <script>
+        // ============================================================
+        //  ЗВУК (Web Audio — простые тоны)
+        // ============================================================
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                try { audioCtx = new AudioCtx(); } catch (_) {}
+            }
+        }
+
+        function playBeep(freq, dur, type = 'sine') {
+            try {
+                initAudio();
+                if (!audioCtx) return;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.value = freq;
+                gain.gain.value = 0.10;
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + dur);
+            } catch (_) {}
+        }
+
+        function soundCorrect() { playBeep(880, 0.18);
+            setTimeout(() => playBeep(1100, 0.15), 160); }
+
+        function soundWrong() { playBeep(440, 0.25);
+            setTimeout(() => playBeep(330, 0.25), 200); }
+
+        function soundTick() { playBeep(600, 0.06); }
+
+        function soundStageComplete() { playBeep(660, 0.12);
+            setTimeout(() => playBeep(880, 0.12), 130);
+            setTimeout(() => playBeep(1100, 0.18), 260); }
+
+        // ============================================================
+        //  КОНФЕТТИ (Canvas)
+        // ============================================================
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let confettiPieces = [];
+        let confettiRunning = false;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class ConfettiPiece {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height - canvas.height;
+                this.w = 6 + Math.random() * 8;
+                this.h = 4 + Math.random() * 6;
+                this.color = ['#E8A87C', '#7A5A4B', '#F5C542', '#7A9B7A', '#C49A6C', '#B57A7A', '#A8C4D4'][Math.floor(Math
+                .random() * 7)];
+                this.vx = (Math.random() - 0.5) * 3;
+                this.vy = 2 + Math.random() * 4;
+                this.rotation = Math.random() * 360;
+                this.rotSpeed = (Math.random() - 0.5) * 6;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.rotation += this.rotSpeed;
+                this.vy += 0.04;
+                if (this.y > canvas.height + 20) { this.y = -20;
+                    this.x = Math.random() * canvas.width;
+                    this.vy = 2 + Math.random() * 4; }
+                if (this.x < -20) this.x = canvas.width + 20;
+                if (this.x > canvas.width + 20) this.x = -20;
+            }
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate((this.rotation * Math.PI) / 180);
+                ctx.fillStyle = this.color;
+                ctx.shadowColor = 'rgba(0,0,0,0.05)';
+                ctx.shadowBlur = 4;
+                ctx.fillRect(-this.w / 2, -this.h / 2, this.w, this.h);
+                ctx.restore();
+            }
+        }
+
+        function startConfetti(count = 120) {
+            if (confettiRunning) return;
+            confettiRunning = true;
+            confettiPieces = [];
+            for (let i = 0; i < count; i++) {
+                confettiPieces.push(new ConfettiPiece());
+            }
+            let frameId = null;
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let alive = false;
+                for (const p of confettiPieces) {
+                    p.update();
+                    p.draw();
+                    if (p.y < canvas.height + 20) alive = true;
+                }
+                if (alive) {
+                    frameId = requestAnimationFrame(animate);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    confettiRunning = false;
+                    frameId = null;
+                }
+            }
+            animate();
+            setTimeout(() => {
+                if (frameId) { cancelAnimationFrame(frameId);
+                    frameId = null;
+                    confettiRunning = false;
+                    ctx.clearRect(0, 0, canvas.width, canvas.height); }
+            }, 3500);
+        }
+
+        function shortConfetti() { startConfetti(80); }
+
+        // ============================================================
+        //  УТИЛИТЫ
+        // ============================================================
+        function shuffle(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function updateGlobalScore() {
+            document.getElementById('total-score-display').textContent = game.totalScore;
+        }
+
+        // ============================================================
+        //  ДАННЫЕ ИГРЫ
+        // ============================================================
+        const game = {
+            totalScore: 0,
+            totalCorrect: 0,
+            totalQuestions: 0,
+
+            // ----- ЭТАП 1 -----
+            s1: {
+                currentLevel: 0,
+                currentQ: 0,
+                score: 0,
+                correctCount: 0,
+                totalQ: 5,
+                timer: 30,
+                timerInterval: null,
+                answered: false,
+                levelCompleted: [false, false, false],
+                levelUnlocked: [true, false, false],
+                levelStars: [0, 0, 0],
+                levels: [
+                    // Уровень 0 — Лёгкий (2 вопроса)
+                    [{
+                        q: 'Что из перечисленного является нормальной реакцией на потерю работы в пожилом возрасте?',
+                        options: [
+                            'Чувство грусти и тревоги',
+                            'Полное безразличие',
+                            'Только гнев',
+                            'Эйфория'
+                        ],
+                        correct: 0,
+                        explain: 'Верно! Грусть и тревога — это естественные чувства. Они показывают, что вы осознаёте важность перемен.'
+                    }, {
+                        q: 'Какая эмоция чаще всего возникает при потере работы у людей старше 60 лет?',
+                        options: [
+                            'Страх перед будущим',
+                            'Радость освобождения',
+                            'Только злость',
+                            'Спокойствие'
+                        ],
+                        correct: 0,
+                        explain: 'Правильно! Страх перед будущим — это нормально. Важно помнить, что вы справлялись с трудностями раньше и справитесь сейчас.'
+                    }],
+                    // Уровень 1 — Средний (2 вопроса)
+                    [{
+                        q: 'Что помогает пожилому человеку справиться с потерей работы?',
+                        options: [
+                            'Поддержка семьи и друзей',
+                            'Полная изоляция',
+                            'Игнорирование ситуации',
+                            'Постоянные жалобы'
+                        ],
+                        correct: 0,
+                        explain: 'Отлично! Поддержка близких — это главная опора. Не стесняйтесь говорить о своих чувствах с теми, кто вам дорог.'
+                    }, {
+                        q: 'Какое занятие может помочь пенсионеру найти новый смысл жизни?',
+                        options: [
+                            'Волонтёрство',
+                            'Просмотр телевизора весь день',
+                            'Избегание общения',
+                            'Постоянный сон'
+                        ],
+                        correct: 0,
+                        explain: 'Верно! Волонтёрство даёт чувство нужности и новые социальные связи. Это прекрасный способ наполнить жизнь смыслом.'
+                    }],
+                    // Уровень 2 — Сложный (1 вопрос)
+                    [{
+                        q: 'Что важно помнить при потере работы в пожилом возрасте?',
+                        options: [
+                            'Ваша ценность не определяется работой',
+                            'Работа — это всё',
+                            'Без работы вы никто',
+                            'Нужно стыдиться'
+                        ],
+                        correct: 0,
+                        explain: 'Мудрое решение! Ваша ценность — в вашем опыте, знаниях и том, кто вы есть. Работа — лишь часть жизни, а не вся жизнь.'
+                    }]
+                ]
+            },
+
+            // ----- ЭТАП 2 -----
+            s2: {
+                currentTask: 0,
+                totalTasks: 4,
+                score: 0,
+                correctCount: 0,
+                checked: false,
+                tasks: [{
+                    question: 'Какие чувства может испытывать человек при потере работы? (выбери все верные)',
+                    options: ['Грусть', 'Тревога', 'Восторг', 'Неуверенность', 'Спокойствие'],
+                    correct: [0, 1, 3],
+                    explain: 'Верно! Грусть, тревога и неуверенность — это нормальные спутники перемен. Они не определяют вас, а лишь показывают, что вы человек.'
+                }, {
+                    question: 'Что помогает восстановить душевное равновесие после потери работы? (выбери все верные)',
+                    options: ['Общение с близкими', 'Занятие любимым делом', 'Избегание людей', 'Прогулки на свежем воздухе',
+                        'Самокритика'
+                    ],
+                    correct: [0, 1, 3],
+                    explain: 'Отлично! Общение, любимые занятия и прогулки — это целительные практики. Они возвращают радость и ощущение жизни.'
+                }, {
+                    question: 'Какие слова поддержки особенно важны для пожилого человека? (выбери все верные)',
+                    options: ['"Ты справишься"', '"Твой опыт важен"', '"Ты уже ничего не можешь"', '"Я верю в тебя"',
+                        '"Всё будет хорошо"'
+                    ],
+                    correct: [0, 1, 3, 4],
+                    explain: 'Правильно! Слова, которые подчёркивают ценность опыта и веру в человека, дают огромную поддержку и надежду.'
+                }, {
+                    question: 'Какие шаги помогут найти новый смысл жизни после потери работы? (выбери все верные)',
+                    options: ['Найти хобби', 'Заниматься волонтёрством', 'Замкнуться в себе', 'Общаться с новыми людьми',
+                        'Ничего не менять'
+                    ],
+                    correct: [0, 1, 3],
+                    explain: 'Мудрое решение! Новые увлечения, волонтёрство и общение открывают двери к новым возможностям и радостям.'
+                }]
+            },
+
+            // ----- ЭТАП 3 -----
+            s3: {
+                currentTask: 0,
+                totalTasks: 6,
+                score: 0,
+                correctCount: 0,
+                answered: false,
+                selected: null,
+                checked: false,
+                tasks: [{
+                    sentence: 'Потеря работы в пожилом возрасте часто вызывает чувство ______.',
+                    options: ['беспомощности', 'радости', 'безразличия', 'гнева'],
+                    correct: 0,
+                    explain: 'Верно! Беспомощность — это временное чувство. Оно пройдёт, когда вы начнёте действовать и искать новые пути.'
+                }, {
+                    sentence: 'Важно помнить, что ______ не определяет личность человека.',
+                    options: ['работа', 'здоровье', 'возраст', 'образование'],
+                    correct: 0,
+                    explain: 'Правильно! Работа — это лишь часть жизни, но не вся личность. Вы — это гораздо больше, чем ваша профессия.'
+                }, {
+                    sentence: 'Поддержка ______ помогает пережить трудные времена.',
+                    options: ['близких людей', 'незнакомцев', 'начальника', 'коллег'],
+                    correct: 0,
+                    explain: 'Отлично! Близкие люди — это опора, которая помогает не сдаваться. Цените их и не бойтесь просить о помощи.'
+                }, {
+                    sentence: 'В зрелом возрасте ______ может стать новым источником радости.',
+                    options: ['волонтёрство', 'одиночество', 'пассивность', 'замкнутость'],
+                    correct: 0,
+                    explain: 'Верно! Волонтёрство дарит чувство нужности и наполняет жизнь новым смыслом. Попробуйте — это изменит вашу жизнь!'
+                }, {
+                    sentence: 'Чтобы сохранить душевное равновесие, полезно ______.',
+                    options: ['общаться с друзьями', 'избегать всех', 'постоянно жаловаться', 'ничего не делать'],
+                    correct: 0,
+                    explain: 'Мудрое решение! Общение с друзьями помогает не замыкаться в себе и видеть жизнь в новых красках.'
+                }, {
+                    sentence: 'Главный урок, который даёт потеря работы — это ______.',
+                    options: ['умение адаптироваться', 'отчаяние', 'безысходность', 'апатия'],
+                    correct: 0,
+                    explain: 'Потрясающе! Умение адаптироваться — это навык, который остаётся с вами навсегда. Жизнь продолжается, и вы способны на многое!'
+                }]
+            }
+        };
+
+        // ============================================================
+        //  ЭТАП 1 — ЛОГИКА
+        // ============================================================
+        const s1 = game.s1;
+
+        function getLevelQuestions(level) {
+            return s1.levels[level] || [];
+        }
+
+        function getCurrentQuestion() {
+            const qs = getLevelQuestions(s1.currentLevel);
+            if (s1.currentQ < qs.length) return qs[s1.currentQ];
+            return null;
+        }
+
+        function renderS1Question() {
+            const q = getCurrentQuestion();
+            if (!q) {
+                completeS1Level();
+                return;
+            }
+
+            s1.answered = false;
+            document.getElementById('s1-next-wrap').style.display = 'none';
+            const fb = document.getElementById('s1-feedback');
+            fb.classList.remove('show', 'success', 'error');
+
+            document.getElementById('s1-question-text').textContent = q.q;
+
+            const grid = document.getElementById('s1-options-grid');
+            grid.innerHTML = '';
+            const labels = ['А', 'Б', 'В', 'Г'];
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.dataset.idx = idx;
+                btn.innerHTML = `<span class="marker">${labels[idx]}</span><span class="opt-label">${opt}</span>`;
+                btn.addEventListener('click', () => handleS1Answer(idx));
+                grid.appendChild(btn);
+            });
+
+            updateS1Progress();
+            startS1Timer();
+            updateS1LevelMap();
+
+            const levelNames = ['Лёгкий', 'Средний', 'Сложный'];
+            document.getElementById('s1-level-label').textContent = levelNames[s1.currentLevel] || '';
+        }
+
+        function updateS1Progress() {
+            let total = 0,
+                done = 0;
+            for (let lv = 0; lv < 3; lv++) {
+                const qs = getLevelQuestions(lv);
+                total += qs.length;
+                if (lv < s1.currentLevel) done += qs.length;
+                else if (lv === s1.currentLevel) done += s1.currentQ;
+            }
+            const totalAll = 5;
+            const pct = Math.min(100, (done / totalAll) * 100);
+            document.getElementById('s1-progress').style.width = pct + '%';
+            document.getElementById('s1-progress-label').textContent = `${done} / ${totalAll}`;
+        }
+
+        function updateS1LevelMap() {
+            for (let lv = 0; lv < 3; lv++) {
+                const el = document.querySelector(`.lv[data-level="${lv}"]`);
+                if (!el) continue;
+                const unlocked = s1.levelUnlocked[lv];
+                const stars = s1.levelStars[lv] || 0;
+                el.classList.toggle('unlocked', unlocked);
+                el.classList.toggle('locked', !unlocked);
+                el.classList.toggle('completed', stars > 0);
+                const starEl = document.getElementById(`lv-stars-${lv}`);
+                if (starEl) {
+                    const total = lv === 2 ? 1 : 2;
+                    let s = '';
+                    for (let i = 0; i < total; i++) s += i < stars ? '⭐' : '☆';
+                    starEl.textContent = s;
+                }
+            }
+        }
+
+        function startS1Timer() {
+            if (s1.timerInterval) { clearInterval(s1.timerInterval);
+                s1.timerInterval = null; }
+            s1.timer = 30;
+            updateS1TimerDisplay();
+            s1.timerInterval = setInterval(() => {
+                s1.timer -= 1;
+                updateS1TimerDisplay();
+                if (s1.timer <= 0) {
+                    clearInterval(s1.timerInterval);
+                    s1.timerInterval = null;
+                    if (!s1.answered) {
+                        soundWrong();
+                        const q = getCurrentQuestion();
+                        if (q) {
+                            const btns = document.querySelectorAll('#s1-options-grid .option-btn');
+                            btns.forEach((btn, idx) => {
+                                btn.classList.add('disabled');
+                                if (idx === q.correct) btn.classList.add('show-correct');
+                            });
+                            const fb = document.getElementById('s1-feedback');
+                            fb.className = 'feedback-box show error';
+                            fb.querySelector('.icon').textContent = '⏰';
+                            fb.querySelector('.fb-title-text').textContent = 'Время вышло!';
+                            fb.querySelector('.fb-body').textContent =
+                                `Правильный ответ: "${q.options[q.correct]}". ${q.explain}`;
+                            s1.answered = true;
+                            document.getElementById('s1-next-wrap').style.display = 'flex';
+                            soundWrong();
+                        }
+                    }
+                }
+            }, 1000);
+        }
+
+        function updateS1TimerDisplay() {
+            const el = document.getElementById('s1-timer');
+            el.textContent = s1.timer;
+            el.classList.toggle('warning', s1.timer <= 5);
+        }
+
+        function handleS1Answer(idx) {
+            if (s1.answered) return;
+            const q = getCurrentQuestion();
+            if (!q) return;
+
+            s1.answered = true;
+            clearInterval(s1.timerInterval);
+            s1.timerInterval = null;
+
+            const btns = document.querySelectorAll('#s1-options-grid .option-btn');
+            btns.forEach((btn, i) => {
+                btn.classList.add('disabled');
+                if (i === q.correct) btn.classList.add('show-correct');
+                if (i === idx && idx !== q.correct) btn.classList.add('wrong');
+                if (i === q.correct) btn.classList.add('correct');
+            });
+
+            const isCorrect = idx === q.correct;
+            const fb = document.getElementById('s1-feedback');
+            fb.className = 'feedback-box show ' + (isCorrect ? 'success' : 'error');
+
+            if (isCorrect) {
+                fb.querySelector('.icon').textContent = '✅';
+                fb.querySelector('.fb-title-text').textContent = 'Отлично!';
+                fb.querySelector('.fb-body').textContent = q.explain;
+                s1.score += 1;
+                s1.correctCount += 1;
+                game.totalScore += 1;
+                game.totalCorrect += 1;
+                soundCorrect();
+                shortConfetti();
+            } else {
+                fb.querySelector('.icon').textContent = '💪';
+                fb.querySelector('.fb-title-text').textContent = 'Почти! Попробуй ещё раз.';
+                fb.querySelector('.fb-body').textContent =
+                    `Правильный ответ: "${q.options[q.correct]}". ${q.explain}`;
+                soundWrong();
+                document.getElementById('s1-question-card').classList.add('shake');
+                setTimeout(() => document.getElementById('s1-question-card').classList.remove('shake'), 500);
+            }
+
+            game.totalQuestions += 1;
+            updateGlobalScore();
+            document.getElementById('s1-next-wrap').style.display = 'flex';
+        }
+
+        function completeS1Level() {
+            const qs = getLevelQuestions(s1.currentLevel);
+            const total = qs.length;
+            let correctSoFar = 0;
+            for (let lv = 0; lv < s1.currentLevel; lv++) correctSoFar += s1.levelStars[lv];
+            const correctInCurrent = s1.correctCount - correctSoFar;
+            const pct = total > 0 ? (correctInCurrent / total) * 100 : 0;
+            const stars = pct >= 100 ? (total === 1 ? 1 : 2) : pct >= 70 ? (total === 1 ? 1 : 1) : 0;
+            s1.levelStars[s1.currentLevel] = stars;
+
+            if (s1.currentLevel < 2 && pct >= 70) {
+                s1.levelUnlocked[s1.currentLevel + 1] = true;
+            }
+
+            updateS1LevelMap();
+
+            if (s1.currentLevel < 2 && s1.levelUnlocked[s1.currentLevel + 1]) {
+                s1.currentLevel += 1;
+                s1.currentQ = 0;
+                renderS1Question();
+            } else if (s1.currentLevel < 2 && !s1.levelUnlocked[s1.currentLevel + 1]) {
+                const fb = document.getElementById('s1-feedback');
+                fb.className = 'feedback-box show error';
+                fb.querySelector('.icon').textContent = '📖';
+                fb.querySelector('.fb-title-text').textContent = 'Попробуй ещё раз!';
+                fb.querySelector('.fb-body').textContent =
+                    `Чтобы перейти на следующий уровень, нужно набрать 70%. У вас ${Math.round(pct)}%. Не сдавайтесь!`;
+                document.getElementById('s1-next-wrap').style.display = 'flex';
+                document.getElementById('s1-next-btn').textContent = 'Пройти уровень снова';
+                document.getElementById('s1-next-btn').onclick = () => {
+                    let correctBefore = 0;
+                    for (let lv = 0; lv < s1.currentLevel; lv++) correctBefore += s1.levelStars[lv];
+                    s1.correctCount = correctBefore;
+                    s1.score = correctBefore;
+                    s1.levelStars[s1.currentLevel] = 0;
+                    s1.currentQ = 0;
+                    renderS1Question();
+                };
+            } else {
+                showS1Complete();
+            }
+        }
+
+        function showS1Complete() {
+            soundStageComplete();
+            const total = 5;
+            const correct = s1.correctCount;
+            const pct = Math.round((correct / total) * 100);
+            document.getElementById('s1-complete-correct').textContent = correct;
+            document.getElementById('s1-complete-total').textContent = total;
+            document.getElementById('s1-complete-pct').textContent = pct + '%';
+
+            const stars = pct >= 100 ? 3 : pct >= 75 ? 2 : pct >= 50 ? 1 : 0;
+            const starEls = document.querySelectorAll('#s1-complete-stars .star');
+            starEls.forEach((el, i) => el.classList.toggle('active', i < stars));
+
+            let msg = '';
+            if (pct === 100) msg = '🌟 Идеальный результат! Вы проявили мудрость и глубокое понимание.';
+            else if (pct >= 75) msg = '👍 Отличный результат! Вы хорошо разбираетесь в психологии поддержки.';
+            else if (pct >= 50) msg = '💪 Хороший результат! Продолжайте учиться — каждый шаг важен.';
+            else msg = '📚 Не расстраивайтесь! Попробуйте ещё раз, и у вас всё получится.';
+            document.getElementById('s1-complete-msg').textContent = msg;
+            document.getElementById('s1-complete-icon').textContent = pct >= 70 ? '🎉' : '💪';
+
+            showScreen('stage1-complete-screen');
+            if (pct >= 70) {
+                document.getElementById('s1-to-stage2').style.display = 'inline-flex';
+                document.getElementById('s1-to-stage2').textContent = 'Перейти к этапу 2 →';
+                document.getElementById('s1-to-stage2').onclick = () => {
+                    showScreen('stage2-screen');
+                    renderS2Task();
+                };
+            } else {
+                document.getElementById('s1-to-stage2').style.display = 'inline-flex';
+                document.getElementById('s1-to-stage2').textContent = 'Пройти этап 1 снова';
+                document.getElementById('s1-to-stage2').onclick = () => {
+                    restartS1();
+                };
+            }
+            updateGlobalScore();
+            startConfetti(100);
+        }
+
+        function restartS1() {
+            s1.currentLevel = 0;
+            s1.currentQ = 0;
+            s1.score = 0;
+            s1.correctCount = 0;
+            s1.timer = 30;
+            s1.answered = false;
+            s1.levelCompleted = [false, false, false];
+            s1.levelUnlocked = [true, false, false];
+            s1.levelStars = [0, 0, 0];
+            game.totalScore -= s1.score;
+            game.totalCorrect -= s1.correctCount;
+            showScreen('stage1-screen');
+            renderS1Question();
+            updateGlobalScore();
+        }
+
+        // ============================================================
+        //  ЭТАП 2 — ЛОГИКА
+        // ============================================================
+        const s2 = game.s2;
+
+        function renderS2Task() {
+            const task = s2.tasks[s2.currentTask];
+            if (!task) { showS2Complete(); return; }
+            s2.checked = false;
+            document.getElementById('s2-check-btn').style.display = 'inline-flex';
+            document.getElementById('s2-next-btn').style.display = 'none';
+
+            document.getElementById('s2-task-label').textContent = `Задание ${s2.currentTask+1} из ${s2.totalTasks}`;
+            document.getElementById('s2-question-text').textContent = task.question;
+
+            const grid = document.getElementById('s2-options-grid');
+            grid.innerHTML = '';
+            const labels = ['А', 'Б', 'В', 'Г', 'Д', 'Е'];
+            task.options.forEach((opt, idx) => {
+                const div = document.createElement('div');
+                div.className = 'multi-opt';
+                div.dataset.idx = idx;
+                div.innerHTML = `<span class="check"></span><span>${labels[idx]}. ${opt}</span>`;
+                div.addEventListener('click', () => toggleS2Option(idx));
+                grid.appendChild(div);
+            });
+
+            const fb = document.getElementById('s2-feedback');
+            fb.classList.remove('show', 'success', 'error');
+
+            updateS2Progress();
+            s2.selected = new Set();
+            document.querySelectorAll('#s2-options-grid .multi-opt').forEach(el => el.classList.remove('selected'));
+        }
+
+        function toggleS2Option(idx) {
+            if (s2.checked) return;
+            const el = document.querySelector(`#s2-options-grid .multi-opt[data-idx="${idx}"]`);
+            if (!el) return;
+            if (el.classList.contains('selected')) {
+                el.classList.remove('selected');
+                s2.selected.delete(idx);
+            } else {
+                el.classList.add('selected');
+                s2.selected.add(idx);
+            }
+            soundTick();
+        }
+
+        function updateS2Progress() {
+            const done = s2.currentTask;
+            const total = s2.totalTasks;
+            const pct = (done / total) * 100;
+            document.getElementById('s2-progress').style.width = pct + '%';
+            document.getElementById('s2-progress-label').textContent = `${done} / ${total}`;
+        }
+
+        function handleS2Check() {
+            if (s2.checked) return;
+            const task = s2.tasks[s2.currentTask];
+            if (!task) return;
+
+            const selected = s2.selected;
+            const correctSet = new Set(task.correct);
+            const allOpts = document.querySelectorAll('#s2-options-grid .multi-opt');
+
+            let isCorrect = true;
+            const selectedArr = Array.from(selected);
+            for (const idx of task.correct) { if (!selected.has(idx)) { isCorrect = false; break; } }
+            for (const idx of selectedArr) { if (!correctSet.has(idx)) { isCorrect = false; break; } }
+
+            s2.checked = true;
+            document.getElementById('s2-check-btn').style.display = 'none';
+
+            allOpts.forEach((el, idx) => {
+                el.classList.add('disabled');
+                if (correctSet.has(idx)) el.classList.add('correct');
+                if (selected.has(idx) && !correctSet.has(idx)) el.classList.add('wrong');
+                if (!selected.has(idx) && correctSet.has(idx)) el.classList.add('missed');
+            });
+
+            const fb = document.getElementById('s2-feedback');
+            fb.className = 'feedback-box show ' + (isCorrect ? 'success' : 'error');
+
+            if (isCorrect) {
+                fb.querySelector('.icon').textContent = '✅';
+                fb.querySelector('.fb-title-text').textContent = 'Отлично!';
+                fb.querySelector('.fb-body').textContent = task.explain;
+                s2.score += 1;
+                s2.correctCount += 1;
+                game.totalScore += 1;
+                game.totalCorrect += 1;
+                soundCorrect();
+                shortConfetti();
+            } else {
+                fb.querySelector('.icon').textContent = '💪';
+                fb.querySelector('.fb-title-text').textContent = 'Почти! Попробуйте ещё раз.';
+                const correctWords = task.correct.map(i => task.options[i]).join(', ');
+                fb.querySelector('.fb-body').textContent =
+                    `Правильные ответы: ${correctWords}. ${task.explain}`;
+                soundWrong();
+                document.querySelector('.card').classList.add('shake');
+                setTimeout(() => document.querySelector('.card').classList.remove('shake'), 500);
+            }
+
+            game.totalQuestions += 1;
+            updateGlobalScore();
+            document.getElementById('s2-next-btn').style.display = 'inline-flex';
+        }
+
+        function goToNextS2() {
+            s2.currentTask += 1;
+            if (s2.currentTask >= s2.totalTasks) showS2Complete();
+            else renderS2Task();
+        }
+
+        function showS2Complete() {
+            soundStageComplete();
+            const total = s2.totalTasks;
+            const correct = s2.correctCount;
+            const pct = Math.round((correct / total) * 100);
+            document.getElementById('s2-complete-correct').textContent = correct;
+            document.getElementById('s2-complete-total').textContent = total;
+            document.getElementById('s2-complete-pct').textContent = pct + '%';
+
+            const stars = pct >= 100 ? 3 : pct >= 75 ? 2 : pct >= 50 ? 1 : 0;
+            const starEls = document.querySelectorAll('#s2-complete-stars .star');
+            starEls.forEach((el, i) => el.classList.toggle('active', i < stars));
+
+            showScreen('stage2-complete-screen');
+            updateGlobalScore();
+            startConfetti(80);
+        }
+
+        // ============================================================
+        //  ЭТАП 3 — ЛОГИКА
+        // ============================================================
+        const s3 = game.s3;
+
+        function renderS3Task() {
+            const task = s3.tasks[s3.currentTask];
+            if (!task) { showS3Complete(); return; }
+            s3.checked = false;
+            s3.answered = false;
+            s3.selected = null;
+
+            document.getElementById('s3-task-label').textContent = `Задание ${s3.currentTask+1} из ${s3.totalTasks}`;
+            document.getElementById('s3-check-btn').style.display = 'inline-flex';
+            document.getElementById('s3-next-btn').style.display = 'none';
+            document.getElementById('s3-clear-btn').style.display = 'inline-flex';
+
+            const fb = document.getElementById('s3-feedback');
+            fb.classList.remove('show', 'success', 'error');
+
+            const sentEl = document.getElementById('s3-sentence');
+            const parts = task.sentence.split('______');
+            sentEl.innerHTML = parts.map((p, i) => {
+                if (i < parts.length - 1) return p + `<span class="blank-place" id="s3-blank">???</span>`;
+                return p;
+            }).join('');
+
+            const wrap = document.getElementById('s3-options-wrap');
+            wrap.innerHTML = '';
+            const labels = ['А', 'Б', 'В', 'Г'];
+            task.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'fill-opt';
+                btn.dataset.idx = idx;
+                btn.textContent = `${labels[idx]}. ${opt}`;
+                btn.addEventListener('click', () => selectS3Option(idx));
+                wrap.appendChild(btn);
+            });
+
+            updateS3Progress();
+        }
+
+        function selectS3Option(idx) {
+            if (s3.checked) return;
+            const task = s3.tasks[s3.currentTask];
+            if (!task) return;
+
+            const wrap = document.getElementById('s3-options-wrap');
+            const btns = wrap.querySelectorAll('.fill-opt');
+            btns.forEach((b, i) => b.classList.toggle('selected', i === idx));
+            s3.selected = idx;
+
+            const blank = document.getElementById('s3-blank');
+            if (blank) {
+                blank.textContent = task.options[idx];
+                blank.classList.add('filled');
+                blank.classList.remove('wrong-filled');
+            }
+            soundTick();
+        }
+
+        function handleS3Clear() {
+            if (s3.checked) return;
+            const wrap = document.getElementById('s3-options-wrap');
+            wrap.querySelectorAll('.fill-opt').forEach(b => b.classList.remove('selected'));
+            s3.selected = null;
+            const blank = document.getElementById('s3-blank');
+            if (blank) { blank.textContent = '???';
+                blank.classList.remove('filled', 'wrong-filled'); }
+            const fb = document.getElementById('s3-feedback');
+            fb.classList.remove('show', 'success', 'error');
+        }
+
+        function handleS3Check() {
+            if (s3.checked) return;
+            const task = s3.tasks[s3.currentTask];
+            if (!task) return;
+            if (s3.selected === null) {
+                const fb = document.getElementById('s3-feedback');
+                fb.className = 'feedback-box show error';
+                fb.querySelector('.icon').textContent = '👀';
+                fb.querySelector('.fb-title-text').textContent = 'Выберите вариант!';
+                fb.querySelector('.fb-body').textContent = 'Пожалуйста, выберите слово из предложенных вариантов.';
+                return;
+            }
+
+            s3.checked = true;
+            const isCorrect = s3.selected === task.correct;
+
+            const wrap = document.getElementById('s3-options-wrap');
+            const btns = wrap.querySelectorAll('.fill-opt');
+            btns.forEach((b, i) => {
+                b.classList.add('disabled');
+                if (i === task.correct) b.classList.add('correct');
+                if (i === s3.selected && i !== task.correct) b.classList.add('wrong');
+                if (i === task.correct && i !== s3.selected) b.classList.add('show-correct');
+            });
+
+            const blank = document.getElementById('s3-blank');
+            if (blank) {
+                if (isCorrect) { blank.classList.add('filled');
+                    blank.classList.remove('wrong-filled'); } else { blank.classList.remove('filled');
+                    blank.classList.add('wrong-filled');
+                    blank.textContent = task.options[task.correct]; }
+            }
+
+            const fb = document.getElementById('s3-feedback');
+            fb.className = 'feedback-box show ' + (isCorrect ? 'success' : 'error');
+
+            if (isCorrect) {
+                fb.querySelector('.icon').textContent = '✅';
+                fb.querySelector('.fb-title-text').textContent = 'Отлично!';
+                fb.querySelector('.fb-body').textContent = task.explain;
+                s3.score += 1;
+                s3.correctCount += 1;
+                game.totalScore += 1;
+                game.totalCorrect += 1;
+                soundCorrect();
+                shortConfetti();
+            } else {
+                fb.querySelector('.icon').textContent = '💪';
+                fb.querySelector('.fb-title-text').textContent = 'Почти! Попробуйте ещё раз.';
+                fb.querySelector('.fb-body').textContent =
+                    `Правильный ответ: "${task.options[task.correct]}". ${task.explain}`;
+                soundWrong();
+                document.querySelector('.card').classList.add('shake');
+                setTimeout(() => document.querySelector('.card').classList.remove('shake'), 500);
+            }
+
+            game.totalQuestions += 1;
+            updateGlobalScore();
+            document.getElementById('s3-check-btn').style.display = 'none';
+            document.getElementById('s3-clear-btn').style.display = 'none';
+            document.getElementById('s3-next-btn').style.display = 'inline-flex';
+        }
+
+        function goToNextS3() {
+            s3.currentTask += 1;
+            if (s3.currentTask >= s3.totalTasks) showS3Complete();
+            else renderS3Task();
+        }
+
+        function updateS3Progress() {
+            const done = s3.currentTask;
+            const total = s3.totalTasks;
+            const pct = (done / total) * 100;
+            document.getElementById('s3-progress').style.width = pct + '%';
+            document.getElementById('s3-progress-label').textContent = `${done} / ${total}`;
+        }
+
+        function showS3Complete() {
+            soundStageComplete();
+            const total = s3.totalTasks;
+            const correct = s3.correctCount;
+            const pct = Math.round((correct / total) * 100);
+            document.getElementById('s3-complete-correct').textContent = correct;
+            document.getElementById('s3-complete-total').textContent = total;
+            document.getElementById('s3-complete-pct').textContent = pct + '%';
+
+            const stars = pct >= 100 ? 3 : pct >= 75 ? 2 : pct >= 50 ? 1 : 0;
+            const starEls = document.querySelectorAll('#s3-complete-stars .star');
+            starEls.forEach((el, i) => el.classList.toggle('active', i < stars));
+
+            showScreen('stage3-complete-screen');
+            updateGlobalScore();
+            startConfetti(80);
+        }
+
+        // ============================================================
+        //  ФИНАЛ
+        // ============================================================
+        function showFinal() {
+            const totalQ = game.totalQuestions || 1;
+            const correct = game.totalCorrect;
+            const pct = Math.round((correct / totalQ) * 100);
+            const score = game.totalScore;
+
+            document.getElementById('final-total-correct').textContent = correct;
+            document.getElementById('final-total-questions').textContent = totalQ;
+            document.getElementById('final-total-pct').textContent = pct + '%';
+            document.getElementById('final-total-score').textContent = score;
+
+            const stars = pct >= 100 ? 3 : pct >= 75 ? 2 : pct >= 50 ? 1 : 0;
+            const starEls = document.querySelectorAll('#final-stars .star');
+            starEls.forEach((el, i) => el.classList.toggle('active', i < stars));
+
+            let msg = '',
+                icon = '🏆';
+            if (pct === 100) { msg = '🌟 Блестяще! Вы показали глубокое понимание и мудрость. Вы — пример для других!';
+                icon = '🏆'; } else if (pct >= 75) { msg =
+                    '👏 Отлично! Вы хорошо усвоили, как поддерживать себя и других в трудной ситуации. Продолжайте в том же духе!';
+                icon = '🎉'; } else if (pct >= 50) { msg =
+                    '💪 Хороший результат! Вы на правильном пути. Продолжайте узнавать новое — это придаёт сил.';
+                icon = '📚'; } else { msg =
+                '🌱 Не сдавайтесь! Каждая попытка делает вас сильнее. Попробуйте ещё раз, и вы увидите прогресс.';
+                icon = '🌱'; }
+
+            document.getElementById('final-icon').textContent = icon;
+            document.getElementById('final-message').textContent = msg;
+
+            showScreen('final-screen');
+            startConfetti(120);
+            soundStageComplete();
+        }
+
+        // ============================================================
+        //  НАВИГАЦИЯ
+        // ============================================================
+        document.getElementById('start-game-btn').addEventListener('click', () => {
+            initAudio();
+            showScreen('stage1-screen');
+            renderS1Question();
+        });
+
+        document.getElementById('s1-next-btn').addEventListener('click', () => {
+            if (s1.currentQ < getLevelQuestions(s1.currentLevel).length - 1) {
+                s1.currentQ += 1;
+                renderS1Question();
+            } else {
+                completeS1Level();
+            }
+        });
+
+        document.getElementById('s2-check-btn').addEventListener('click', handleS2Check);
+        document.getElementById('s2-next-btn').addEventListener('click', goToNextS2);
+
+        document.getElementById('s3-check-btn').addEventListener('click', handleS3Check);
+        document.getElementById('s3-clear-btn').addEventListener('click', handleS3Clear);
+        document.getElementById('s3-next-btn').addEventListener('click', goToNextS3);
+
+        document.getElementById('s2-to-stage3').addEventListener('click', () => {
+            showScreen('stage3-screen');
+            renderS3Task();
+        });
+
+        document.getElementById('s3-to-final').addEventListener('click', showFinal);
+
+        document.getElementById('final-restart-btn').addEventListener('click', () => {
+            game.totalScore = 0;
+            game.totalCorrect = 0;
+            game.totalQuestions = 0;
+            updateGlobalScore();
+
+            s1.currentLevel = 0;
+            s1.currentQ = 0;
+            s1.score = 0;
+            s1.correctCount = 0;
+            s1.timer = 30;
+            s1.answered = false;
+            s1.levelCompleted = [false, false, false];
+            s1.levelUnlocked = [true, false, false];
+            s1.levelStars = [0, 0, 0];
+
+            s2.currentTask = 0;
+            s2.score = 0;
+            s2.correctCount = 0;
+            s2.checked = false;
+            s2.selected = new Set();
+
+            s3.currentTask = 0;
+            s3.score = 0;
+            s3.correctCount = 0;
+            s3.answered = false;
+            s3.selected = null;
+            s3.checked = false;
+
+            showScreen('start-screen');
+            updateGlobalScore();
+        });
+
+        // ============================================================
+        //  ИНИЦИАЛИЗАЦИЯ
+        // ============================================================
+        updateGlobalScore();
+        showScreen('start-screen');
+        console.log('🕊️ Игра "Мудрость перемен" загружена. Тема: потеря работы, возраст 65+');
+    </script>
+</body>
+</html>
